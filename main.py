@@ -45,3 +45,10 @@ if __name__ == '__main__':
                               'Las primeras 2 linas deben contener el país de origen y destino.'))
 
     args = parser.parse_args()
+
+    from algoritmos import edmonds_karp, minCut
+    
+    ciudades, capacidades, (fuente, sumidero) = parse_file(args.archivo)
+    flujos, ciud_inv = edmonds_karp(ciudades, capacidades, fuente, sumidero)
+    x,y = minCut(fuente, ciudades, ciud_inv, flujos)
+    print(x,y)
