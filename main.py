@@ -1,7 +1,7 @@
 from __future__ import annotations
+from typing import DefaultDict, Dict, List, Tuple
 from ciudades import Ciudades
 path = str
-from typing import DefaultDict, Dict, List, Tuple
 
 
 def parse_file(listado_ciudades: path) -> Tuple[Ciudades, DefaultDict, Tuple[str, str]]:
@@ -17,8 +17,8 @@ def parse_file(listado_ciudades: path) -> Tuple[Ciudades, DefaultDict, Tuple[str
 
     # primeras 2 lineas, la fuente y sumidero
     # operador magico ,= (es simplemente desempaquetado de tuplas, no un operador)
-        ciud_s ,= next(filas)
-        ciud_t ,= next(filas)
+        ciud_s, = next(filas)
+        ciud_t, = next(filas)
 
         for a, b, capacidad in filas:
             capacidad = int(capacidad)
@@ -27,6 +27,16 @@ def parse_file(listado_ciudades: path) -> Tuple[Ciudades, DefaultDict, Tuple[str
             total_ciudades |= {a, b}
     return Ciudades(grafo_ciudades, total_ciudades),  matriz_capacidades, (ciud_s, ciud_t)
 
+
+def determinarTrayectos(ciudades: Ciudades,
+                        conjuntoFuente: set(), conjuntoSumidero: set()):
+    trayectos = []
+    for u in conjuntoFuente:
+        for v in ciudades.adyacencias[u]:
+            if v in conjuntoSumidero:
+                trayectos.append((u, v))
+
+    return trayectos
 
 
 if __name__ == '__main__':
@@ -47,8 +57,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     from algoritmos import edmonds_karp, minCut
-    
+
     ciudades, capacidades, (fuente, sumidero) = parse_file(args.archivo)
     flujos, ciud_inv = edmonds_karp(ciudades, capacidades, fuente, sumidero)
-    x,y = minCut(fuente, ciudades, ciud_inv, flujos)
-    print(x,y)
+    x, y = minCut(fuente, ciudades, ciud_inv, flujos)
+    trayectos = determinarTrayectos(ciudades, x, y)
+    
+    print("trayectos ideales para campaña publicitaria: ")
+    for trycto in trayectos:
+        print(f"vuelo de {trycto[0]} a {trycto[1]}")
